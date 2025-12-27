@@ -4,18 +4,13 @@ import com.church.bibletracker.config.BibleConfig;
 import com.church.bibletracker.model.BibleBook;
 import com.church.bibletracker.model.CurrentReading;
 import com.church.bibletracker.model.ReadingProgress;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+import com.church.bibletracker.repository.ReadingProgressRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,56 +18,25 @@ import java.util.stream.Collectors;
 @Service
 public class ProgressService {
 
-    private static final String CSV_FILE = "reading_progress.csv";
-
-    private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     private final BibleConfig bibleConfig;
 
-    public ProgressService(BibleConfig bibleConfig) {
+    private final ReadingProgressRepository progressRepository;
+
+    public ProgressService(BibleConfig bibleConfig, ReadingProgressRepository progressRepository) {
 
         this.bibleConfig = bibleConfig;
-        initializeCsvFile();
-    }
-
-    private void initializeCsvFile() {
-
-        File file = new File(CSV_FILE);
-        if (!file.exists()) {
-            try (CSVWriter writer = new CSVWriter(new FileWriter(file))) {
-                writer.writeNext(new String[]{"name", "book", "chapter", "datetime_read"});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        this.progressRepository = progressRepository;
     }
 
     public void markAsRead(String name, String book, int chapter) {
 
-        try (CSVWriter writer = new CSVWriter(new FileWriter(CSV_FILE, true))) {
-            writer.writeNext(
-                    new String[]{name, book, String.valueOf(chapter), LocalDateTime.now().format(DATETIME_FORMAT)});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ReadingProgress progress = new ReadingProgress(name, book, chapter, LocalDateTime.now());
+        progressRepository.save(progress);
     }
 
     public List<ReadingProgress> getProgressByName(String name) {
 
-        List<ReadingProgress> progressList = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(CSV_FILE))) {
-            String[] line;
-            reader.readNext(); // Skip header
-            while ((line = reader.readNext()) != null) {
-                if (line[0].equals(name)) {
-                    progressList.add(new ReadingProgress(line[0], line[1], Integer.parseInt(line[2]),
-                                                         LocalDateTime.parse(line[3], DATETIME_FORMAT)));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return progressList;
+        return progressRepository.findByNameOrderByDateTimeReadAsc(name);
     }
 
     public CurrentReading getCurrentReading(String name) {
