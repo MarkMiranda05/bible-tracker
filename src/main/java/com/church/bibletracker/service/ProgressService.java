@@ -8,8 +8,10 @@ import com.church.bibletracker.repository.ReadingProgressRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,11 +79,13 @@ public class ProgressService {
 
         try {
             ClassPathResource resource = new ClassPathResource("users.txt");
-            return Files.readAllLines(resource.getFile().toPath())
-                        .stream()
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
+            InputStream inputStream = resource.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            
+            return reader.lines()
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
