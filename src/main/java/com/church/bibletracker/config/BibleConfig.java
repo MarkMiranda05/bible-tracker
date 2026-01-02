@@ -1,11 +1,13 @@
 package com.church.bibletracker.config;
 
 import com.church.bibletracker.model.BibleBook;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Component
 public class BibleConfig {
 
@@ -82,11 +84,6 @@ public class BibleConfig {
         books.add(new BibleBook("3 John", 1));
         books.add(new BibleBook("Jude", 1));
         books.add(new BibleBook("Revelation", 22));
-    }
-
-    public List<BibleBook> getBooks() {
-
-        return books;
     }
 
     public int getTotalChapters() {

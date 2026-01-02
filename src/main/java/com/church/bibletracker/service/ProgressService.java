@@ -5,6 +5,7 @@ import com.church.bibletracker.model.BibleBook;
 import com.church.bibletracker.model.CurrentReading;
 import com.church.bibletracker.model.ReadingProgress;
 import com.church.bibletracker.repository.ReadingProgressRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ProgressService {
 
@@ -81,13 +83,10 @@ public class ProgressService {
             ClassPathResource resource = new ClassPathResource("users.txt");
             InputStream inputStream = resource.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            
-            return reader.lines()
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
+
+            return reader.lines().map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception occurred: {}", e.getMessage());
             return new ArrayList<>();
         }
     }

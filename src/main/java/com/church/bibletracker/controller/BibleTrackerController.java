@@ -3,6 +3,7 @@ package com.church.bibletracker.controller;
 import com.church.bibletracker.config.BibleConfig;
 import com.church.bibletracker.model.CurrentReading;
 import com.church.bibletracker.model.ReadingProgress;
+import com.church.bibletracker.model.ReadingProgressDTO;
 import com.church.bibletracker.service.ProgressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class BibleTrackerController {
@@ -71,9 +73,12 @@ public class BibleTrackerController {
 
     @GetMapping("/api/progress/{name}")
     @ResponseBody
-    public List<ReadingProgress> getProgress(@PathVariable String name) {
+    public List<ReadingProgressDTO> getProgress(@PathVariable String name) {
 
-        return progressService.getProgressByName(name);
+        return progressService.getProgressByName(name)
+                              .stream()
+                              .map(ReadingProgressDTO::new)
+                              .collect(Collectors.toList());
     }
 
     @GetMapping("/api/stats/{name}")
