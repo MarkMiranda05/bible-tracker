@@ -40,7 +40,7 @@ public class ProgressService {
 
     public List<ReadingProgress> getProgressByName(String name) {
 
-        return progressRepository.findByNameOrderByDateTimeReadAsc(name);
+        return progressRepository.findByNameOrderByDateTimeReadDesc(name);
     }
 
     public CurrentReading getCurrentReading(String name) {
@@ -52,8 +52,7 @@ public class ProgressService {
             return new CurrentReading("Genesis", 1);
         }
 
-        // Find the last read chapter
-        ReadingProgress lastRead = progress.get(progress.size() - 1);
+        ReadingProgress lastRead = progress.get(0);
         String lastBook = lastRead.getBook();
         int lastChapter = lastRead.getChapter();
 

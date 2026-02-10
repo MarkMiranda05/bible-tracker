@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface ReadingProgressRepository extends JpaRepository<ReadingProgress, Long> {
 
-    List<ReadingProgress> findByNameOrderByDateTimeReadAsc(String name);
+    List<ReadingProgress> findByNameOrderByDateTimeReadDesc(String name);
 
 }
